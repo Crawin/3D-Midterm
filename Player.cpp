@@ -242,9 +242,9 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 //	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Apache.bin");
 	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Models/Hummer.bin");
 
-	pGameObject->Rotate(15.0f, 0.0f, 0.0f);
+	pGameObject->Rotate(0.0f, 0.0f, 0.0f);
 	pGameObject->SetPosition(0, 0, 0);
-	pGameObject->SetScale(8.5f, 8.5f, 8.5f);
+	pGameObject->SetScale(12, 12, 12);
 	SetChild(pGameObject, true);
 
 	OnInitialize();

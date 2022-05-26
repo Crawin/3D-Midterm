@@ -74,26 +74,37 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	BuildDefaultLightsAndMaterials();
 
 	m_nBackObjects = 6;			// 선인장, 돌1, 돌2
+	// 선인장 position (-260,-50 | -200) scale 40
+	// 돌1 position(-260, -35 | -80) scale 50
+	// 돌2 position(-255, -50 | -160) scale 50
 	m_ppBackObjects = new CGameObject * [m_nBackObjects];
 	for (int i = 0; i < m_nBackObjects; ++i) {
 		CGameObject* pBackModel = NULL;
+		CBackObject* pBackObject = NULL;
+		pBackObject = new CBackObject();
 		switch (uid(dre)) {
 		case 0:			// 선인장
 			pBackModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Cactus.bin");
+			pBackObject->SetChild(pBackModel, true);
+			if (i < 3)pBackObject->SetPosition(-260.0f, 0.0f, -200 + i * 200);
+			else pBackObject->SetPosition(-50.0f, 0.0f, -200 + (i % 3) * 200);
+			pBackObject->SetScale(40.f, 40.f, 40.f);
 			break;
 		case 1:			// 돌 1
 			pBackModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Rock.bin");
+			pBackObject->SetChild(pBackModel, true);
+			if (i < 3)pBackObject->SetPosition(-260.0f, 0.0f, -80 + i * 200);
+			else pBackObject->SetPosition(-35.0f, 0.0f, -80 + (i % 3) * 200);
+			pBackObject->SetScale(50.f, 50.f, 50.f);
 			break;
 		case 2:			// 돌 2
 			pBackModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Rock2.bin");
+			pBackObject->SetChild(pBackModel, true);
+			if (i < 3)pBackObject->SetPosition(-255.0f, 0.0f, -160 + i * 200);
+			else pBackObject->SetPosition(-40.0f, 0.0f, -160 + (i % 3) * 200);
+			pBackObject->SetScale(50.f, 50.f, 50.f);
 			break;
 		}
-		CBackObject* pBackObject = NULL;
-		pBackObject = new CBackObject();
-		pBackObject->SetChild(pBackModel, true);
-		pBackObject->OnInitialize();
-		pBackObject->SetPosition(0.0f, 0.0f, i * 10.0f);
-		pBackObject->SetScale(20.5f, 20.5f, 20.5f);
 		pBackObject->Rotate(0.0f, 0.0f, 0.0f);
 		m_ppBackObjects[i] = pBackObject;
 	}
@@ -307,20 +318,25 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	D3D12_GPU_VIRTUAL_ADDRESS d3dcbLightsGpuVirtualAddress = m_pd3dcbLights->GetGPUVirtualAddress();
 	pd3dCommandList->SetGraphicsRootConstantBufferView(2, d3dcbLightsGpuVirtualAddress); //Lights
 
-	for (int i = 0; i < m_nGameObjects; i++)
-	{
-		if (m_ppGameObjects[i])
-		{
-			m_ppGameObjects[i]->Animate(m_fElapsedTime, NULL);
-			m_ppGameObjects[i]->UpdateTransform(NULL);
-			m_ppGameObjects[i]->Render(pd3dCommandList, pCamera);
-		}
-	}
+	//for (int i = 0; i < m_nGameObjects; i++)
+	//{
+	//	if (m_ppGameObjects[i])
+	//	{
+	//		m_ppGameObjects[i]->Animate(m_fElapsedTime, NULL);
+	//		m_ppGameObjects[i]->UpdateTransform(NULL);
+	//		m_ppGameObjects[i]->Render(pd3dCommandList, pCamera);
+	//	}
+	//}
+	m_ppGameObjects[5]->Animate(m_fElapsedTime, NULL);
+			m_ppGameObjects[5]->UpdateTransform(NULL);
+			m_ppGameObjects[5]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < m_nBackObjects; ++i)
 	{
 		if (m_ppBackObjects[i])
 		{
 			m_ppBackObjects[i]->Animate(m_fElapsedTime, NULL);
+			m_ppBackObjects[i]->MoveForward(-0.3);
+			//if (m_ppBackObjects[i]->GetPosition().x > -300)m_ppBackObjects[i]->MoveStrafe(-1.f);
 			m_ppBackObjects[i]->UpdateTransform(NULL);
 			m_ppBackObjects[i]->Render(pd3dCommandList, pCamera);
 		}

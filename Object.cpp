@@ -649,7 +649,7 @@ CGameObject* CGameObject::MakeRoad(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	info->m_xmf4x4Transform = Matrix4x4::Identity();
 
-	float Width = 100, Depth = 1500;
+	float Width = 200, Depth = 1500;
 	float HalfWidth = Width / 2, HalfDepth = Depth / 2;
 	int VertexNum = 6;
 	CMeshLoadInfo* pMeshInfo = NULL;
