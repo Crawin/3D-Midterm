@@ -180,7 +180,7 @@ public:
 	CGameObject *FindFrame(char *pstrFrameName);
 
 	UINT GetMeshType() { return((m_pMesh) ? m_pMesh->GetType() : 0); }
-
+	int type = 3;
 public:
 	static MATERIALSLOADINFO *LoadMaterialsInfoFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, FILE *pInFile);
 	static CMeshLoadInfo *LoadMeshInfoFromFile(FILE *pInFile);
@@ -297,4 +297,5 @@ class CBackObject : public CGameObject
 public:
 	CBackObject() { }
 	virtual ~CBackObject() {}
+	virtual void Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent = NULL);
 };

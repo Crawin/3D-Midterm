@@ -791,8 +791,8 @@ COldCarObject::~COldCarObject()
 
 void COldCarObject::OnInitialize()
 {
-	m_pFrontLeftWheelFrame = FindFrame("rotor");
-	m_pFrontRightWheelFrame = FindFrame("black_m_7");
+	m_pFrontLeftWheelFrame = FindFrame("FL");
+	m_pFrontRightWheelFrame = FindFrame("FR");
 }
 
 void COldCarObject::Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent)
@@ -859,3 +859,10 @@ void CRallyCarObject::OnInitialize()
 	m_pFrontRightWheelFrame = FindFrame("Tail_Rotor");
 }
 
+
+void CBackObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
+{
+	if (m_xmf4x4World._43 > -300)MoveForward(-500*fTimeElapsed);
+	else MoveForward(900);
+	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
+}

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Scene.h"
 #include <random>
+#include "GameFramework.h"
 std::random_device rd;
 std::default_random_engine dre(rd());
 std::uniform_int_distribution<int> uid(0, 2);
@@ -73,10 +74,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	BuildDefaultLightsAndMaterials();
 
-	m_nBackObjects = 6;			// 선인장, 돌1, 돌2
-	// 선인장 position (-260,-50 | -200) scale 40
-	// 돌1 position(-260, -35 | -80) scale 50
-	// 돌2 position(-255, -50 | -160) scale 50
+	m_nBackObjects = 8;			// 선인장, 돌1, 돌2
+// 선인장 position (-260,-50 | -200) scale 40
+// 돌1 position(-260, -35 | -80) scale 50
+// 돌2 position(-255, -50 | -160) scale 50
 	m_ppBackObjects = new CGameObject * [m_nBackObjects];
 	for (int i = 0; i < m_nBackObjects; ++i) {
 		CGameObject* pBackModel = NULL;
@@ -85,29 +86,33 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		switch (uid(dre)) {
 		case 0:			// 선인장
 			pBackModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Cactus.bin");
+			pBackObject->type = 0;
 			pBackObject->SetChild(pBackModel, true);
-			if (i < 3)pBackObject->SetPosition(-260.0f, 0.0f, -200 + i * 200);
-			else pBackObject->SetPosition(-50.0f, 0.0f, -200 + (i % 3) * 200);
+			if (i < (m_nBackObjects / 2))pBackObject->SetPosition(-260.0f, 0.0f, -200 + i * 200);
+			else pBackObject->SetPosition(-50.0f, 0.0f, -200 + (i % (m_nBackObjects / 2)) * 200);
 			pBackObject->SetScale(40.f, 40.f, 40.f);
 			break;
 		case 1:			// 돌 1
 			pBackModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Rock.bin");
+			pBackObject->type = 1;
 			pBackObject->SetChild(pBackModel, true);
-			if (i < 3)pBackObject->SetPosition(-260.0f, 0.0f, -80 + i * 200);
-			else pBackObject->SetPosition(-35.0f, 0.0f, -80 + (i % 3) * 200);
+			if (i < (m_nBackObjects / 2))pBackObject->SetPosition(-260.0f, 0.0f, -80 + i * 200);
+			else pBackObject->SetPosition(-35.0f, 0.0f, -80 + (i % (m_nBackObjects / 2)) * 200);
 			pBackObject->SetScale(50.f, 50.f, 50.f);
 			break;
 		case 2:			// 돌 2
 			pBackModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Rock2.bin");
+			pBackObject->type = 2;
 			pBackObject->SetChild(pBackModel, true);
-			if (i < 3)pBackObject->SetPosition(-255.0f, 0.0f, -160 + i * 200);
-			else pBackObject->SetPosition(-40.0f, 0.0f, -160 + (i % 3) * 200);
+			if (i < (m_nBackObjects / 2))pBackObject->SetPosition(-255.0f, 0.0f, -160 + i * 200);
+			else pBackObject->SetPosition(-40.0f, 0.0f, -160 + (i % (m_nBackObjects / 2)) * 200);
 			pBackObject->SetScale(50.f, 50.f, 50.f);
 			break;
 		}
 		pBackObject->Rotate(0.0f, 0.0f, 0.0f);
 		m_ppBackObjects[i] = pBackObject;
 	}
+	//BuildBackObjects(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 	//------------------------------------------------------------------------
 	m_nGameObjects = 6;
 	m_ppGameObjects = new CGameObject*[m_nGameObjects];
@@ -298,7 +303,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	m_fElapsedTime = fTimeElapsed;
 
 	for (int i = 0; i < m_nGameObjects; i++) m_ppGameObjects[i]->Animate(fTimeElapsed, NULL);
-
 	if (m_pLights)
 	{
 		m_pLights[1].m_xmf3Position = m_pPlayer->GetPosition();
@@ -335,8 +339,6 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_ppBackObjects[i])
 		{
 			m_ppBackObjects[i]->Animate(m_fElapsedTime, NULL);
-			m_ppBackObjects[i]->MoveForward(-0.3);
-			//if (m_ppBackObjects[i]->GetPosition().x > -300)m_ppBackObjects[i]->MoveStrafe(-1.f);
 			m_ppBackObjects[i]->UpdateTransform(NULL);
 			m_ppBackObjects[i]->Render(pd3dCommandList, pCamera);
 		}
