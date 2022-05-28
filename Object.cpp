@@ -191,6 +191,20 @@ void CGameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pC
 	if (m_pChild) m_pChild->Render(pd3dCommandList, pCamera);
 }
 
+void CGameObject::UpdateBoundingBox()
+{
+	if (m_pChild)
+	{
+		XMMATRIX temp = XMLoadFloat4x4(&m_xmf4x4World);
+		temp = temp + DirectX::XMMatrixTranslation(m_xmf3ModelPosition.x, m_xmf3ModelPosition.y, m_xmf3ModelPosition.z);
+
+		m_pChild->m_xmOOBB.Transform(m_xmOOBB, temp);
+		//m_pChild->m_xmOOBB.Transform(m_xmOOBB, XMLoadFloat4x4(&m_xmf4x4World));
+		XMStoreFloat4(&m_xmOOBB.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
+		cout << m_pChild->m_pstrFrameName <<" OOBB(" << m_xmOOBB.Center.x << ", " << m_xmOOBB.Center.z << ")" << endl;
+	}
+}
+
 void CGameObject::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
 }
@@ -524,7 +538,7 @@ CGameObject *CGameObject::LoadFrameHierarchyFromFile(ID3D12Device *pd3dDevice, I
 		{
 			XMFLOAT3 xmf3Position, xmf3Rotation, xmf3Scale;
 			XMFLOAT4 xmf4Rotation;
-			nReads = (UINT)::fread(&pGameObject->m_xmf3Position, sizeof(float), 3, pInFile);
+			nReads = (UINT)::fread(&xmf3Position, sizeof(float), 3, pInFile);
 			nReads = (UINT)::fread(&xmf3Rotation, sizeof(float), 3, pInFile); //Euler Angle
 			nReads = (UINT)::fread(&xmf3Scale, sizeof(float), 3, pInFile);
 			nReads = (UINT)::fread(&xmf4Rotation, sizeof(float), 4, pInFile); //Quaternion
@@ -666,6 +680,7 @@ CGameObject* CGameObject::MakeRoad(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	pMeshInfo->m_pxmf3Positions[3] = XMFLOAT3(HalfWidth, 0, -HalfDepth);
 	pMeshInfo->m_pxmf3Positions[4] = XMFLOAT3(-HalfWidth, 0, HalfDepth);
 	pMeshInfo->m_pxmf3Positions[5] = XMFLOAT3(HalfWidth, 0, HalfDepth);
+
 	pMeshInfo->m_nType |= VERTEXT_NORMAL;
 	pMeshInfo->m_pxmf3Normals = new XMFLOAT3[VertexNum];
 	CMesh* pMesh = NULL;
@@ -765,15 +780,25 @@ void CCarObject::OnInitialize()
 
 void CCarObject::Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent)
 {
-	if (m_pFrontLeftWheelFrame)
+	if (m_pFrontLeftFrame)
 	{
-		XMMATRIX xmmtxRotate = XMMatrixRotationY(XMConvertToRadians(360.0f * 2.0f) * fTimeElapsed);
-		m_pFrontLeftWheelFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pFrontLeftWheelFrame->m_xmf4x4Transform);
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pFrontLeftFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pFrontLeftFrame->m_xmf4x4Transform);
 	}
-	if (m_pFrontRightWheelFrame)
+	if (m_pFrontRightFrame)
 	{
-		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
-		m_pFrontRightWheelFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pFrontRightWheelFrame->m_xmf4x4Transform);
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pFrontRightFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pFrontRightFrame->m_xmf4x4Transform);
+	}
+	if (m_pBackLeftFrame)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pBackLeftFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pBackLeftFrame->m_xmf4x4Transform);
+	}
+	if (m_pBackRightFrame)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pBackRightFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pBackRightFrame->m_xmf4x4Transform);
 	}
 
 	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
@@ -791,21 +816,29 @@ COldCarObject::~COldCarObject()
 
 void COldCarObject::OnInitialize()
 {
-	m_pFrontLeftWheelFrame = FindFrame("FL");
-	m_pFrontRightWheelFrame = FindFrame("FR");
 }
 
 void COldCarObject::Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent)
 {
-	if (m_pFrontLeftWheelFrame)
+	if (m_pFrontLeftFrame)
 	{
-		XMMATRIX xmmtxRotate = XMMatrixRotationY(XMConvertToRadians(360.0f * 2.0f) * fTimeElapsed);
-		m_pFrontLeftWheelFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pFrontLeftWheelFrame->m_xmf4x4Transform);
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pFrontLeftFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pFrontLeftFrame->m_xmf4x4Transform);
 	}
-	if (m_pFrontRightWheelFrame)
+	if (m_pFrontRightFrame)
 	{
-		XMMATRIX xmmtxRotate = XMMatrixRotationY(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
-		m_pFrontRightWheelFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pFrontRightWheelFrame->m_xmf4x4Transform);
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pFrontRightFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pFrontRightFrame->m_xmf4x4Transform);
+	}
+	if (m_pBackLeftFrame)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pBackLeftFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pBackLeftFrame->m_xmf4x4Transform);
+	}
+	if (m_pBackRightFrame)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pBackRightFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pBackRightFrame->m_xmf4x4Transform);
 	}
 
 	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
@@ -823,8 +856,10 @@ CHummerObject::~CHummerObject()
 
 void CHummerObject::OnInitialize()
 {
-	m_pFrontLeftWheelFrame = FindFrame("MainRotor_LOD0");
-	m_pFrontRightWheelFrame = FindFrame("TailRotor_LOD0");
+	m_pFrontLeftFrame = FindFrame("wheel_LF");
+	m_pFrontRightFrame = FindFrame("wheel_LR");
+	m_pBackLeftFrame = FindFrame("Wheel_RF");
+	m_pBackRightFrame = FindFrame("Wheel_RR");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -839,8 +874,6 @@ CPoliceCarObject::~CPoliceCarObject()
 
 void CPoliceCarObject::OnInitialize()
 {
-	m_pFrontLeftWheelFrame = FindFrame("Rotor");
-	m_pFrontRightWheelFrame = FindFrame("Back_Rotor");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -855,8 +888,6 @@ CRallyCarObject::~CRallyCarObject()
 
 void CRallyCarObject::OnInitialize()
 {
-	m_pFrontLeftWheelFrame = FindFrame("Top_Rotor");
-	m_pFrontRightWheelFrame = FindFrame("Tail_Rotor");
 }
 
 

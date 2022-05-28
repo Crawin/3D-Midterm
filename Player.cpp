@@ -171,6 +171,8 @@ void CPlayer::Update(float fTimeElapsed)
 	if (fDeceleration > fLength)
 		fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+
+	UpdateBoundingBox();
 }
 
 CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
@@ -247,13 +249,8 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	pGameObject->SetScale(12, 12, 12);
 	SetChild(pGameObject, true);
 
-	CGameObject* body = FindFrame("Body");
-	if (!body) body = FindFrame("body_low");
-	XMFLOAT3 AABBCenter = body->m_pMesh->m_xmf3AABBCenter;
-	pGameObject->m_xmf3BodyCenter = Vector3::Subtract(AABBCenter, pGameObject->m_xmf3Position);
-	pGameObject->m_xmf3BodyExtents = body->m_pMesh->m_xmf3AABBExtents;
-	pGameObject->m_xmOOBB = BoundingOrientedBox(pGameObject->m_xmf3BodyCenter, pGameObject->m_xmf3BodyExtents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-
+	pGameObject->m_xmf3BodyExtents = XMFLOAT3(20, 10, 40);
+	pGameObject->m_xmOOBB = BoundingOrientedBox(XMFLOAT3(0.0f, 0.0f, 0.0f), pGameObject->m_xmf3BodyExtents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	OnInitialize();
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -341,7 +338,6 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetFriction(20.5f);
 			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
 			SetMaxVelocityXZ(25.5f);
-			//SetMaxVelocityXZ(50.0f);
 			SetMaxVelocityY(40.0f);
 			m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.25f);

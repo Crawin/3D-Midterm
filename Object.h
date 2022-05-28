@@ -133,11 +133,11 @@ public:
 	CGameObject 					*m_pChild = NULL;
 	CGameObject 					*m_pSibling = NULL;
 
-	XMFLOAT3						m_xmf3BodyCenter;
 	XMFLOAT3						m_xmf3BodyExtents;
 
-	XMFLOAT3						m_xmf3Position;
 	BoundingOrientedBox				m_xmOOBB = BoundingOrientedBox();
+
+	XMFLOAT3 m_xmf3ModelPosition = { 0, 0, 0 };
 
 	void SetMesh(CMesh *pMesh);
 	void SetShader(CShader *pShader);
@@ -187,6 +187,8 @@ public:
 
 	UINT GetMeshType() { return((m_pMesh) ? m_pMesh->GetType() : 0); }
 	int type = 3;
+	void UpdateBoundingBox();
+
 public:
 	static MATERIALSLOADINFO *LoadMaterialsInfoFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, FILE *pInFile);
 	static CMeshLoadInfo *LoadMeshInfoFromFile(FILE *pInFile);
@@ -240,11 +242,10 @@ public:
 	virtual ~CCarObject();
 
 protected:
-	CGameObject					*m_pFrontLeftWheelFrame = NULL;
-	CGameObject* m_pFrontRightWheelFrame = NULL;
-	CGameObject					* m_pBackLeftWheelFrame = NULL;
-	CGameObject* m_pBackRightWheelFrame = NULL;
-
+	CGameObject					* m_pFrontLeftFrame = NULL;
+	CGameObject* m_pFrontRightFrame = NULL;
+	CGameObject					* m_pBackLeftFrame = NULL;
+	CGameObject* m_pBackRightFrame = NULL;
 public:
 	virtual void OnInitialize();
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent = NULL);
@@ -276,7 +277,6 @@ class CHummerObject : public CCarObject
 public:
 	CHummerObject();
 	virtual ~CHummerObject();
-
 public:
 	virtual void OnInitialize();
 };
@@ -286,7 +286,6 @@ class CRallyCarObject : public CCarObject
 public:
 	CRallyCarObject();
 	virtual ~CRallyCarObject();
-
 public:
 	virtual void OnInitialize();
 };

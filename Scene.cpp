@@ -132,9 +132,12 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	pHummerObject->SetChild(pHummerModel, true);
 	pHummerObject->OnInitialize();
 	// 9.227764 0.1698588 -4.310363
+	pHummerObject->m_xmf3ModelPosition = XMFLOAT3(92.27764, 1.698588, -43.10363);
 	pHummerObject->SetPosition(-92.27764f, -1.698588f, 43.10363f);
 	pHummerObject->SetScale(10.f, 10.f, 10.f);
 	pHummerObject->Rotate(0.0f, 0.0f, 0.0f);
+	pHummerObject->m_xmf3BodyExtents = XMFLOAT3(20, 10, 40);
+	pHummerObject->m_xmOOBB = BoundingOrientedBox(XMFLOAT3(0.0f, 0.0f, 0.0f), pHummerObject->m_xmf3BodyExtents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	m_ppGameObjects[0] = pHummerObject;
 
 	CGameObject *pPoliceCarModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/PoliceCar.bin");
@@ -147,6 +150,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	pPoliceCarObject->SetPosition(0,0,0);
 	pPoliceCarObject->SetScale(12.f, 12.f, 12.f);
 	pPoliceCarObject->Rotate(0.0f, 0.0f, 0.0f);
+	pPoliceCarObject->m_xmf3BodyExtents = XMFLOAT3(20, 10, 40);
+	pPoliceCarObject->m_xmOOBB = BoundingOrientedBox(XMFLOAT3(0.0f, 0.0f, 0.0f), pPoliceCarObject->m_xmf3BodyExtents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	m_ppGameObjects[1] = pPoliceCarObject;
 
 	CGameObject *pRallyCarModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/RallyCar.bin");
@@ -156,9 +161,12 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	pRallyCarObject->SetChild(pRallyCarModel, true);
 	pRallyCarObject->OnInitialize();
 	//13.50904 0.01345238 -0.2916864
+	pRallyCarObject->m_xmf3ModelPosition = XMFLOAT3(13.50904 * 12, 0.01345238 * 12, -0.2916864 * 12);
 	pRallyCarObject->SetPosition(-13.50904 * 12, -0.01345238 * 12, 0.2916864 * 12);
 	pRallyCarObject->SetScale(12.f, 12.f, 12.f);
 	pRallyCarObject->Rotate(0.0f, 0.0f, 0.0f);
+	pRallyCarObject->m_xmf3BodyExtents = XMFLOAT3(20, 10, 40);
+	pRallyCarObject->m_xmOOBB = BoundingOrientedBox(XMFLOAT3(0.0f, 0.0f, 0.0f), pRallyCarObject->m_xmf3BodyExtents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	m_ppGameObjects[2] = pRallyCarObject;
 
 	CGameObject* pRoadModel = CGameObject::MakeRoad(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);			//  ±æ
@@ -282,7 +290,7 @@ bool CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 					m_pPlayer->m_iMovetoLine = 0;
 				}
 				cout << "m_iMoveLine : " << m_pPlayer->m_iMovetoLine << endl;
-				cout << "("<<m_pPlayer->m_xmOOBB.Center.x<<","<< m_pPlayer->m_xmOOBB.Center.z<<")" << endl;
+				//cout << "("<<m_pPlayer->m_pChild->m_xmOOBB.Center.x<<","<< m_pPlayer->m_pChild->m_xmOOBB.Center.z<<")" << endl;
 				cout << "------------------------------------------------------------------" << endl;
 			}
 			break;
@@ -340,12 +348,13 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		{
 			m_ppGameObjects[i]->Animate(m_fElapsedTime, NULL);
 			m_ppGameObjects[i]->UpdateTransform(NULL);
+			m_ppGameObjects[i]->UpdateBoundingBox();
 			m_ppGameObjects[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
-	//m_ppGameObjects[5]->Animate(m_fElapsedTime, NULL);
-	//m_ppGameObjects[5]->UpdateTransform(NULL);
-	//m_ppGameObjects[5]->Render(pd3dCommandList, pCamera);
+	//m_ppGameObjects[3]->Animate(m_fElapsedTime, NULL);
+	//m_ppGameObjects[3]->UpdateTransform(NULL);
+	//m_ppGameObjects[3]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < m_nBackObjects; ++i)
 	{
 		if (m_ppBackObjects[i])
