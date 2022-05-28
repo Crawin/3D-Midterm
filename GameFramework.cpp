@@ -467,31 +467,35 @@ void CGameFramework::ProcessInput()
 
 void CGameFramework::MovingLine()
 {
-	if (m_pPlayer->m_iBeforeLine != m_pPlayer->m_iMovetoLine) {
+	//if (m_pPlayer->m_iBeforeLine != m_pPlayer->m_iMovetoLine) {
+	if (m_pPlayer->m_bMoving) {
 		XMFLOAT3 goal;
 		XMFLOAT3 direction;
 		float speed = 0.01f;
 		switch (m_pPlayer->m_iMovetoLine) {
 		case 0:
-			goal = { -50,0,0 };
+			goal = { -60,0,0 };
 			direction = Vector3::Subtract(goal, m_pPlayer->GetPosition());
 			goal = Vector3::ScalarProduct(direction, speed, false);
 			m_pPlayer->Move(goal, false);
-			if (m_pPlayer->GetPosition().x < -49.3) m_pPlayer->m_iBeforeLine = 0;
+			if (abs(direction.x) < 0.1)m_pPlayer->m_bMoving = false;
+			//if (m_pPlayer->GetPosition().x < -49.3)	m_pPlayer->m_iBeforeLine = 0;
 			break;
 		case 1:
 			goal = { 0,0,0 };
 			direction = Vector3::Subtract(goal, m_pPlayer->GetPosition());
 			goal = Vector3::ScalarProduct(direction, speed, false);
 			m_pPlayer->Move(goal, false);
-			if (abs(m_pPlayer->GetPosition().x) < 0.3)m_pPlayer->m_iBeforeLine = 1;
+			if (abs(direction.x) < 0.1)m_pPlayer->m_bMoving = false;
+			//if (abs(m_pPlayer->GetPosition().x) < 0.3)	m_pPlayer->m_iBeforeLine = 1;
 			break;
 		case 2:
-			goal = { 50,0,0 };
+			goal = { 60,0,0 };
 			direction = Vector3::Subtract(goal, m_pPlayer->GetPosition());
 			goal = Vector3::ScalarProduct(direction, speed, false);
 			m_pPlayer->Move(goal, false);
-			if (m_pPlayer->GetPosition().x > 49.3) m_pPlayer->m_iBeforeLine = 2;
+			if (abs(direction.x) < 0.1)m_pPlayer->m_bMoving = false;
+			//if (m_pPlayer->GetPosition().x > 49.3)	m_pPlayer->m_iBeforeLine = 2;
 			break;
 		}
 	}

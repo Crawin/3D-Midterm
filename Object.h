@@ -249,6 +249,7 @@ protected:
 public:
 	virtual void OnInitialize();
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent = NULL);
+	float						m_fSpeed = 0;
 };
 
 class COldCarObject : public CCarObject

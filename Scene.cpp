@@ -9,6 +9,7 @@
 std::random_device rd;
 std::default_random_engine dre(rd());
 std::uniform_int_distribution<int> uid(0, 3);
+uniform_real_distribution<double> Rspeed();
 CScene::CScene()
 {
 }
@@ -284,24 +285,22 @@ bool CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 		case 'Q': m_ppGameObjects[0]->MoveUp(+1.0f); break;
 		case 'R': m_ppGameObjects[0]->MoveUp(-1.0f); break;
 		case VK_LEFT:
-			if (m_pPlayer->m_iBeforeLine == m_pPlayer->m_iMovetoLine) {
+			//if (m_pPlayer->m_iBeforeLine == m_pPlayer->m_iMovetoLine) {
+			m_pPlayer->m_bMoving = true;
 				m_pPlayer->m_iMovetoLine--;
 				if (m_pPlayer->m_iMovetoLine < 0) {
 					m_pPlayer->m_iMovetoLine = 0;
 				}
-				cout << "m_iMoveLine : " << m_pPlayer->m_iMovetoLine << endl;
-				//cout << "("<<m_pPlayer->m_pChild->m_xmOOBB.Center.x<<","<< m_pPlayer->m_pChild->m_xmOOBB.Center.z<<")" << endl;
-				cout << "------------------------------------------------------------------" << endl;
-			}
+			//}
 			break;
 		case VK_RIGHT:
-			if (m_pPlayer->m_iBeforeLine == m_pPlayer->m_iMovetoLine) {
+			//if (m_pPlayer->m_iBeforeLine == m_pPlayer->m_iMovetoLine){
+			m_pPlayer->m_bMoving = true;
 				m_pPlayer->m_iMovetoLine++;
 				if (m_pPlayer->m_iMovetoLine > 2) {
 					m_pPlayer->m_iMovetoLine = 2;
 				}
-				std::cout << "m_iMoveLine : " << m_pPlayer->m_iMovetoLine << endl;
-			}
+			//}
 			break;
 		default:
 			break;

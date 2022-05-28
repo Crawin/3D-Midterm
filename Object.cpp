@@ -801,6 +801,8 @@ void CCarObject::Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent)
 		m_pBackRightFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pBackRightFrame->m_xmf4x4Transform);
 	}
 
+	if (m_xmf4x4World._43 > -300) MoveForward(-10 *fTimeElapsed);
+
 	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
 }
 

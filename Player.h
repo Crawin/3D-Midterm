@@ -84,6 +84,7 @@ public:
 public:
 	int m_iMovetoLine = 1;
 	int m_iBeforeLine = 1;
+	bool m_bMoving = false;
 };
 
 class CAirplanePlayer : public CPlayer
