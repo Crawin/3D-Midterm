@@ -53,6 +53,8 @@ CMeshFromFile::CMeshFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList
 			m_pd3dSubSetIndexBufferViews[i].SizeInBytes = sizeof(UINT) * pMeshInfo->m_pnSubSetIndices[i];
 		}
 	}
+	m_xmf3AABBCenter = pMeshInfo->m_xmf3AABBCenter;
+	m_xmf3AABBExtents = pMeshInfo->m_xmf3AABBExtents;
 }
 
 CMeshFromFile::~CMeshFromFile()

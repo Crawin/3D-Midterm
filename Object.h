@@ -133,6 +133,12 @@ public:
 	CGameObject 					*m_pChild = NULL;
 	CGameObject 					*m_pSibling = NULL;
 
+	XMFLOAT3						m_xmf3BodyCenter;
+	XMFLOAT3						m_xmf3BodyExtents;
+
+	XMFLOAT3						m_xmf3Position;
+	BoundingOrientedBox				m_xmOOBB = BoundingOrientedBox();
+
 	void SetMesh(CMesh *pMesh);
 	void SetShader(CShader *pShader);
 	void SetShader(int nMaterial, CShader *pShader);

@@ -31,6 +31,7 @@ public:
     void ReleaseObjects();
 
     void ProcessInput();
+	void MovingLine();
     void AnimateObjects();
     void FrameAdvance();
 

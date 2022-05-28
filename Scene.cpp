@@ -8,7 +8,7 @@
 #include "GameFramework.h"
 std::random_device rd;
 std::default_random_engine dre(rd());
-std::uniform_int_distribution<int> uid(0, 2);
+std::uniform_int_distribution<int> uid(0, 3);
 CScene::CScene()
 {
 }
@@ -75,9 +75,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	BuildDefaultLightsAndMaterials();
 
 	m_nBackObjects = 8;			// 선인장, 돌1, 돌2
-// 선인장 position (-260,-50 | -200) scale 40
-// 돌1 position(-260, -35 | -80) scale 50
-// 돌2 position(-255, -50 | -160) scale 50
+// 선인장 center: 3.92249*scale 0 4.797254*scale, scale : 40
+// 돌1 center: 3*scale 0 2*scale, scale: 50
+// 돌2 center: 3*scale 0 3.267579*scale, scale: 50
+// 나무 center: 0 0 0
 	m_ppBackObjects = new CGameObject * [m_nBackObjects];
 	for (int i = 0; i < m_nBackObjects; ++i) {
 		CGameObject* pBackModel = NULL;
@@ -88,34 +89,77 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			pBackModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Cactus.bin");
 			pBackObject->type = 0;
 			pBackObject->SetChild(pBackModel, true);
-			if (i < (m_nBackObjects / 2))pBackObject->SetPosition(-260.0f, 0.0f, -200 + i * 200);
-			else pBackObject->SetPosition(-50.0f, 0.0f, -200 + (i % (m_nBackObjects / 2)) * 200);
+			if (i < (m_nBackObjects / 2))pBackObject->SetPosition(-3.92249 * 40 - 100, 0, -4.797254 * 40 + (i * 200));
+			else pBackObject->SetPosition(-3.92249 * 40 + 105, 0, -4.797254 * 40 + (i % (m_nBackObjects / 2)) * 200);
 			pBackObject->SetScale(40.f, 40.f, 40.f);
 			break;
 		case 1:			// 돌 1
 			pBackModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Rock.bin");
 			pBackObject->type = 1;
 			pBackObject->SetChild(pBackModel, true);
-			if (i < (m_nBackObjects / 2))pBackObject->SetPosition(-260.0f, 0.0f, -80 + i * 200);
-			else pBackObject->SetPosition(-35.0f, 0.0f, -80 + (i % (m_nBackObjects / 2)) * 200);
+			if (i < (m_nBackObjects / 2))pBackObject->SetPosition(-3 * 50 - 110, 0, -2 * 50 + (i * 200));
+			else pBackObject->SetPosition(-3 * 50 + 115, 0, -2 * 50 + (i % (m_nBackObjects / 2)) * 200);
 			pBackObject->SetScale(50.f, 50.f, 50.f);
 			break;
 		case 2:			// 돌 2
 			pBackModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Rock2.bin");
 			pBackObject->type = 2;
 			pBackObject->SetChild(pBackModel, true);
-			if (i < (m_nBackObjects / 2))pBackObject->SetPosition(-255.0f, 0.0f, -160 + i * 200);
-			else pBackObject->SetPosition(-40.0f, 0.0f, -160 + (i % (m_nBackObjects / 2)) * 200);
+			if (i < (m_nBackObjects / 2))pBackObject->SetPosition(-3 * 50 - 110, 0, -3.267579 * 50 + (i * 200));
+			else pBackObject->SetPosition(-3 * 50 + 115, 0, -3.267579 * 50 + (i % (m_nBackObjects / 2)) * 200);
 			pBackObject->SetScale(50.f, 50.f, 50.f);
+			break;
+		case 3:			// 나무
+			pBackModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Tree.bin");
+			pBackObject->type = 3;
+			pBackObject->SetChild(pBackModel, true);
+			if (i < (m_nBackObjects / 2))pBackObject->SetPosition(100.0f, 0.0f, (i * 200));
+			else pBackObject->SetPosition(-100.0f, 0.0f,(i % (m_nBackObjects / 2)) * 200);
+			pBackObject->SetScale(10.f, 10.f, 10.f);
 			break;
 		}
 		pBackObject->Rotate(0.0f, 0.0f, 0.0f);
 		m_ppBackObjects[i] = pBackObject;
 	}
-	//BuildBackObjects(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 	//------------------------------------------------------------------------
-	m_nGameObjects = 6;
+	m_nGameObjects = 4;
 	m_ppGameObjects = new CGameObject*[m_nGameObjects];
+
+	CGameObject *pHummerModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/Hummer.bin");
+	CHummerObject* pHummerObject = NULL;
+
+	pHummerObject = new CHummerObject();
+	pHummerObject->SetChild(pHummerModel, true);
+	pHummerObject->OnInitialize();
+	// 9.227764 0.1698588 -4.310363
+	pHummerObject->SetPosition(-92.27764f, -1.698588f, 43.10363f);
+	pHummerObject->SetScale(10.f, 10.f, 10.f);
+	pHummerObject->Rotate(0.0f, 0.0f, 0.0f);
+	m_ppGameObjects[0] = pHummerObject;
+
+	CGameObject *pPoliceCarModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/PoliceCar.bin");
+	CPoliceCarObject* pPoliceCarObject = NULL;
+
+	pPoliceCarObject = new CPoliceCarObject();
+	pPoliceCarObject->SetChild(pPoliceCarModel, true);
+	pPoliceCarObject->OnInitialize();
+	// 0 0 0
+	pPoliceCarObject->SetPosition(0,0,0);
+	pPoliceCarObject->SetScale(12.f, 12.f, 12.f);
+	pPoliceCarObject->Rotate(0.0f, 0.0f, 0.0f);
+	m_ppGameObjects[1] = pPoliceCarObject;
+
+	CGameObject *pRallyCarModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Models/RallyCar.bin");
+	CRallyCarObject* pRallyCarObject = NULL;
+
+	pRallyCarObject = new CRallyCarObject();
+	pRallyCarObject->SetChild(pRallyCarModel, true);
+	pRallyCarObject->OnInitialize();
+	//13.50904 0.01345238 -0.2916864
+	pRallyCarObject->SetPosition(-13.50904 * 12, -0.01345238 * 12, 0.2916864 * 12);
+	pRallyCarObject->SetScale(12.f, 12.f, 12.f);
+	pRallyCarObject->Rotate(0.0f, 0.0f, 0.0f);
+	m_ppGameObjects[2] = pRallyCarObject;
 
 	CGameObject* pRoadModel = CGameObject::MakeRoad(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);			//  길
 	CRoadObject* pRoadObject = new CRoadObject();
@@ -123,59 +167,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	pRoadObject->SetPosition(0, 0, 0);
 	pRoadObject->SetScale(1, 1, 1);
 	pRoadObject->Rotate(0, 0, 0);
-	m_ppGameObjects[5] = pRoadObject;
-
-	CGameObject *pOldCarModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Apache.bin");
-	COldCarObject* pOldCarObject = NULL;
-
-	pOldCarObject = new COldCarObject();
-	pOldCarObject->SetChild(pOldCarModel, true);
-	pOldCarObject->OnInitialize();
-	pOldCarObject->SetPosition(+130.0f, 0.0f, 160.0f);
-	pOldCarObject->SetScale(1.5f, 1.5f, 1.5f);
-	pOldCarObject->Rotate(0.0f, 90.0f, 0.0f);
-	m_ppGameObjects[0] = pOldCarObject;
-
-	pOldCarObject = new COldCarObject();
-	pOldCarObject->SetChild(pOldCarModel, true);
-	pOldCarObject->OnInitialize();
-	pOldCarObject->SetPosition(-75.0f, 0.0f, 80.0f);
-	pOldCarObject->SetScale(1.5f, 1.5f, 1.5f);
-	pOldCarObject->Rotate(0.0f, -90.0f, 0.0f);
-	m_ppGameObjects[1] = pOldCarObject;
-
-	CGameObject *pGunshipModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gunship.bin");
-	CPoliceCarObject* pGunshipObject = NULL;
-
-	pGunshipObject = new CPoliceCarObject();
-	pGunshipObject->SetChild(pGunshipModel, true);
-	pGunshipObject->OnInitialize();
-	pGunshipObject->SetPosition(135.0f, 40.0f, 220.0f);
-	pGunshipObject->SetScale(8.5f, 8.5f, 8.5f);
-	pGunshipObject->Rotate(0.0f, -90.0f, 0.0f);
-	m_ppGameObjects[2] = pGunshipObject;
-
-	CGameObject *pSuperCobraModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/SuperCobra.bin");
-	CHummerObject* pSuperCobraObject = NULL;
-
-	pSuperCobraObject = new CHummerObject();
-	pSuperCobraObject->SetChild(pSuperCobraModel, true);
-	pSuperCobraObject->OnInitialize();
-	pSuperCobraObject->SetPosition(95.0f, 50.0f, 50.0f);
-	pSuperCobraObject->SetScale(4.5f, 4.5f, 4.5f);
-	pSuperCobraObject->Rotate(0.0f, -90.0f, 0.0f);
-	m_ppGameObjects[3] = pSuperCobraObject;
-
-	CGameObject *pMi24Model = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mi24.bin");
-	CRallyCarObject* pMi24Object = NULL;
-
-	pMi24Object = new CRallyCarObject();
-	pMi24Object->SetChild(pMi24Model, true);
-	pMi24Object->OnInitialize();
-	pMi24Object->SetPosition(-95.0f, 50.0f, 50.0f);
-	pMi24Object->SetScale(4.5f, 4.5f, 4.5f);
-	pMi24Object->Rotate(0.0f, -90.0f, 0.0f);
-	m_ppGameObjects[4] = pMi24Object;
+	m_ppGameObjects[3] = pRoadObject;
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -283,6 +275,26 @@ bool CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 		case 'D': m_ppGameObjects[0]->MoveStrafe(+1.0f); break;
 		case 'Q': m_ppGameObjects[0]->MoveUp(+1.0f); break;
 		case 'R': m_ppGameObjects[0]->MoveUp(-1.0f); break;
+		case VK_LEFT:
+			if (m_pPlayer->m_iBeforeLine == m_pPlayer->m_iMovetoLine) {
+				m_pPlayer->m_iMovetoLine--;
+				if (m_pPlayer->m_iMovetoLine < 0) {
+					m_pPlayer->m_iMovetoLine = 0;
+				}
+				cout << "m_iMoveLine : " << m_pPlayer->m_iMovetoLine << endl;
+				cout << "("<<m_pPlayer->m_xmOOBB.Center.x<<","<< m_pPlayer->m_xmOOBB.Center.z<<")" << endl;
+				cout << "------------------------------------------------------------------" << endl;
+			}
+			break;
+		case VK_RIGHT:
+			if (m_pPlayer->m_iBeforeLine == m_pPlayer->m_iMovetoLine) {
+				m_pPlayer->m_iMovetoLine++;
+				if (m_pPlayer->m_iMovetoLine > 2) {
+					m_pPlayer->m_iMovetoLine = 2;
+				}
+				std::cout << "m_iMoveLine : " << m_pPlayer->m_iMovetoLine << endl;
+			}
+			break;
 		default:
 			break;
 		}
@@ -322,18 +334,18 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	D3D12_GPU_VIRTUAL_ADDRESS d3dcbLightsGpuVirtualAddress = m_pd3dcbLights->GetGPUVirtualAddress();
 	pd3dCommandList->SetGraphicsRootConstantBufferView(2, d3dcbLightsGpuVirtualAddress); //Lights
 
-	//for (int i = 0; i < m_nGameObjects; i++)
-	//{
-	//	if (m_ppGameObjects[i])
-	//	{
-	//		m_ppGameObjects[i]->Animate(m_fElapsedTime, NULL);
-	//		m_ppGameObjects[i]->UpdateTransform(NULL);
-	//		m_ppGameObjects[i]->Render(pd3dCommandList, pCamera);
-	//	}
-	//}
-	m_ppGameObjects[5]->Animate(m_fElapsedTime, NULL);
-			m_ppGameObjects[5]->UpdateTransform(NULL);
-			m_ppGameObjects[5]->Render(pd3dCommandList, pCamera);
+	for (int i = 0; i < m_nGameObjects; i++)
+	{
+		if (m_ppGameObjects[i])
+		{
+			m_ppGameObjects[i]->Animate(m_fElapsedTime, NULL);
+			m_ppGameObjects[i]->UpdateTransform(NULL);
+			m_ppGameObjects[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
+	//m_ppGameObjects[5]->Animate(m_fElapsedTime, NULL);
+	//m_ppGameObjects[5]->UpdateTransform(NULL);
+	//m_ppGameObjects[5]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < m_nBackObjects; ++i)
 	{
 		if (m_ppBackObjects[i])

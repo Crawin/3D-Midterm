@@ -524,7 +524,7 @@ CGameObject *CGameObject::LoadFrameHierarchyFromFile(ID3D12Device *pd3dDevice, I
 		{
 			XMFLOAT3 xmf3Position, xmf3Rotation, xmf3Scale;
 			XMFLOAT4 xmf4Rotation;
-			nReads = (UINT)::fread(&xmf3Position, sizeof(float), 3, pInFile);
+			nReads = (UINT)::fread(&pGameObject->m_xmf3Position, sizeof(float), 3, pInFile);
 			nReads = (UINT)::fread(&xmf3Rotation, sizeof(float), 3, pInFile); //Euler Angle
 			nReads = (UINT)::fread(&xmf3Scale, sizeof(float), 3, pInFile);
 			nReads = (UINT)::fread(&xmf4Rotation, sizeof(float), 4, pInFile); //Quaternion
@@ -862,7 +862,13 @@ void CRallyCarObject::OnInitialize()
 
 void CBackObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 {
-	if (m_xmf4x4World._43 > -300)MoveForward(-500*fTimeElapsed);
-	else MoveForward(900);
+	if (m_xmf4x4World._43 > -300)MoveForward(-200 * fTimeElapsed);
+	else 
+		switch (type) {
+		case 0:m_xmf4x4Transform._43 = -4.797254 * 40 + 3 * 200; break;
+		case 1:m_xmf4x4Transform._43 = -2 * 50 + 3 * 200; break;
+		case 2:m_xmf4x4Transform._43 = -3.267579 * 50 + 3 * 200; break;
+		case 3:m_xmf4x4Transform._43 = 3 * 200; break;
+		}
 	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
 }

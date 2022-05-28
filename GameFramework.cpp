@@ -450,7 +450,6 @@ void CGameFramework::ProcessInput()
 			cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
 			SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 		}
-
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{
 			if (cxDelta || cyDelta)
@@ -461,6 +460,39 @@ void CGameFramework::ProcessInput()
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 			}
 			if (dwDirection) m_pPlayer->Move(dwDirection, 1.5f, true);
+		}
+	}
+	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+}
+
+void CGameFramework::MovingLine()
+{
+	if (m_pPlayer->m_iBeforeLine != m_pPlayer->m_iMovetoLine) {
+		XMFLOAT3 goal;
+		XMFLOAT3 direction;
+		float speed = 0.01f;
+		switch (m_pPlayer->m_iMovetoLine) {
+		case 0:
+			goal = { -50,0,0 };
+			direction = Vector3::Subtract(goal, m_pPlayer->GetPosition());
+			goal = Vector3::ScalarProduct(direction, speed, false);
+			m_pPlayer->Move(goal, false);
+			if (m_pPlayer->GetPosition().x < -49.3) m_pPlayer->m_iBeforeLine = 0;
+			break;
+		case 1:
+			goal = { 0,0,0 };
+			direction = Vector3::Subtract(goal, m_pPlayer->GetPosition());
+			goal = Vector3::ScalarProduct(direction, speed, false);
+			m_pPlayer->Move(goal, false);
+			if (abs(m_pPlayer->GetPosition().x) < 0.3)m_pPlayer->m_iBeforeLine = 1;
+			break;
+		case 2:
+			goal = { 50,0,0 };
+			direction = Vector3::Subtract(goal, m_pPlayer->GetPosition());
+			goal = Vector3::ScalarProduct(direction, speed, false);
+			m_pPlayer->Move(goal, false);
+			if (m_pPlayer->GetPosition().x > 49.3) m_pPlayer->m_iBeforeLine = 2;
+			break;
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
@@ -507,9 +539,12 @@ void CGameFramework::FrameAdvance()
 {    
 	m_GameTimer.Tick(0.0f);
 	
-	ProcessInput();
+	//ProcessInput();
+	MovingLine();
 
     AnimateObjects();
+
+	// 여기에 충돌체크 
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);

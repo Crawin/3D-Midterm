@@ -23,6 +23,8 @@
 #include <fstream>
 #include <vector>
 
+#include <iostream>
+
 using namespace std;
 
 #include <d3d12.h>

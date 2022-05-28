@@ -28,11 +28,12 @@ protected:
 	UINT							m_nOffset = 0;
 
 	UINT							m_nType = 0;
-
 public:
 	UINT GetType() { return(m_nType); }
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList) { }
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, int nSubSet) { }
+	XMFLOAT3						m_xmf3AABBCenter = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3						m_xmf3AABBExtents = XMFLOAT3(0.0f, 0.0f, 0.0f);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

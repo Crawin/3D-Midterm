@@ -168,7 +168,8 @@ void CPlayer::Update(float fTimeElapsed)
 
 	fLength = Vector3::Length(m_xmf3Velocity);
 	float fDeceleration = (m_fFriction * fTimeElapsed);
-	if (fDeceleration > fLength) fDeceleration = fLength;
+	if (fDeceleration > fLength)
+		fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
 }
 
@@ -241,11 +242,17 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 //	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Apache.bin");
 	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Models/OldCar.bin");
-
 	pGameObject->Rotate(0.0f, 0.0f, 0.0f);
 	pGameObject->SetPosition(0, 0, 0);
 	pGameObject->SetScale(12, 12, 12);
 	SetChild(pGameObject, true);
+
+	CGameObject* body = FindFrame("Body");
+	if (!body) body = FindFrame("body_low");
+	XMFLOAT3 AABBCenter = body->m_pMesh->m_xmf3AABBCenter;
+	pGameObject->m_xmf3BodyCenter = Vector3::Subtract(AABBCenter, pGameObject->m_xmf3Position);
+	pGameObject->m_xmf3BodyExtents = body->m_pMesh->m_xmf3AABBExtents;
+	pGameObject->m_xmOOBB = BoundingOrientedBox(pGameObject->m_xmf3BodyCenter, pGameObject->m_xmf3BodyExtents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	OnInitialize();
 
@@ -261,21 +268,35 @@ void CAirplanePlayer::OnInitialize()
 //	m_pMainRotorFrame = FindFrame("rotor");
 //	m_pTailRotorFrame = FindFrame("black_m_7");
 
-	m_pMainRotorFrame = FindFrame("Rotor");
-	m_pTailRotorFrame = FindFrame("Back_Rotor");
+	//m_pMainRotorFrame = FindFrame("Rotor");
+	//m_pTailRotorFrame = FindFrame("Back_Rotor");
+	m_pFrontLeftFrame = FindFrame("FL");
+	m_pFrontRightFrame = FindFrame("FR");
+	m_pBackLeftFrame = FindFrame("BL");
+	m_pBackRightFrame = FindFrame("BR");
 }
 
 void CAirplanePlayer::Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent)
 {
-	if (m_pMainRotorFrame)
+	if (m_pFrontLeftFrame)
 	{
-		XMMATRIX xmmtxRotate = XMMatrixRotationY(XMConvertToRadians(360.0f * 2.0f) * fTimeElapsed);
-		m_pMainRotorFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pMainRotorFrame->m_xmf4x4Transform);
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pFrontLeftFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pFrontLeftFrame->m_xmf4x4Transform);
 	}
-	if (m_pTailRotorFrame)
+	if (m_pFrontRightFrame)
 	{
-		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
-		m_pTailRotorFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pTailRotorFrame->m_xmf4x4Transform);
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pFrontRightFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pFrontRightFrame->m_xmf4x4Transform);
+	}
+	if (m_pBackLeftFrame)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pBackLeftFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pBackLeftFrame->m_xmf4x4Transform);
+	}
+	if (m_pBackRightFrame)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(-360.0f * 2.0f) * fTimeElapsed);
+		m_pBackRightFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pBackRightFrame->m_xmf4x4Transform);
 	}
 
 	CPlayer::Animate(fTimeElapsed, pxmf4x4Parent);
@@ -320,6 +341,7 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetFriction(20.5f);
 			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
 			SetMaxVelocityXZ(25.5f);
+			//SetMaxVelocityXZ(50.0f);
 			SetMaxVelocityY(40.0f);
 			m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.25f);

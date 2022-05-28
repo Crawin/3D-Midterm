@@ -18,6 +18,14 @@ BOOL InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
+#ifdef _DEBUG
+	#ifdef UNICODE
+	#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+	#else
+	#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+	#endif
+#endif
+
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
