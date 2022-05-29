@@ -128,17 +128,21 @@ public:
 
 	XMFLOAT4X4						m_xmf4x4Transform;
 	XMFLOAT4X4						m_xmf4x4World;
+	XMFLOAT4X4						m_xmf4x4DefaultTransform;
 
 	CGameObject 					*m_pParent = NULL;
 	CGameObject 					*m_pChild = NULL;
 	CGameObject 					*m_pSibling = NULL;
 
-	XMFLOAT3						m_xmf3BodyExtents;
+	XMFLOAT3						m_xmf3BodyExtents = { 30, 5, 60 };
 
 	BoundingOrientedBox				m_xmOOBB = BoundingOrientedBox();
 
 	XMFLOAT3 m_xmf3ModelPosition = { 0, 0, 0 };
 
+	bool							m_bCrash = false;
+	int								m_iGoAwayFrame = 0;
+	int						m_fSpeed = 0;
 	void SetMesh(CMesh *pMesh);
 	void SetShader(CShader *pShader);
 	void SetShader(int nMaterial, CShader *pShader);
@@ -176,6 +180,7 @@ public:
 	void MoveStrafe(float fDistance = 1.0f);
 	void MoveUp(float fDistance = 1.0f);
 	void MoveForward(float fDistance = 1.0f);
+	void GoAway(XMFLOAT3& PlayerPosition, float fTimeElapsed);
 
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
 	void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
@@ -188,7 +193,8 @@ public:
 	UINT GetMeshType() { return((m_pMesh) ? m_pMesh->GetType() : 0); }
 	int type = 3;
 	void UpdateBoundingBox();
-
+	void SetTransformMatrixToDefualtMatrix();
+	void ResetTransformMatrix();
 public:
 	static MATERIALSLOADINFO *LoadMaterialsInfoFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, FILE *pInFile);
 	static CMeshLoadInfo *LoadMeshInfoFromFile(FILE *pInFile);
@@ -249,7 +255,8 @@ protected:
 public:
 	virtual void OnInitialize();
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent = NULL);
-	float						m_fSpeed = 0;
+	void Reposition();
+
 };
 
 class COldCarObject : public CCarObject

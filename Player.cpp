@@ -243,14 +243,13 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	m_pCamera = ChangeCamera(/*SPACESHIP_CAMERA*/THIRD_PERSON_CAMERA, 0.0f);
 
 //	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Apache.bin");
-	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Models/OldCar.bin");
+	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Models/PoliceCar.bin");
 	pGameObject->Rotate(0.0f, 0.0f, 0.0f);
 	pGameObject->SetPosition(0, 0, 0);
 	pGameObject->SetScale(12, 12, 12);
 	SetChild(pGameObject, true);
 
-	pGameObject->m_xmf3BodyExtents = XMFLOAT3(20, 10, 40);
-	pGameObject->m_xmOOBB = BoundingOrientedBox(XMFLOAT3(0.0f, 0.0f, 0.0f), pGameObject->m_xmf3BodyExtents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	pGameObject->m_xmOOBB = BoundingOrientedBox(XMFLOAT3(0.0f, 0.0f, 20.0f), pGameObject->m_xmf3BodyExtents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	OnInitialize();
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);

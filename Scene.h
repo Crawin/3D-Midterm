@@ -63,6 +63,8 @@ public:
 
 	void ReleaseUploadBuffers();
 
+	void CheckCollisionPlayerbyCar();
+
 	CPlayer						*m_pPlayer = NULL;
 
 public:

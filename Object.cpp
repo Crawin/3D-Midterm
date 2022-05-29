@@ -198,11 +198,22 @@ void CGameObject::UpdateBoundingBox()
 		XMMATRIX temp = XMLoadFloat4x4(&m_xmf4x4World);
 		temp = temp + DirectX::XMMatrixTranslation(m_xmf3ModelPosition.x, m_xmf3ModelPosition.y, m_xmf3ModelPosition.z);
 
-		m_pChild->m_xmOOBB.Transform(m_xmOOBB, temp);
+		//m_xmOOBB.Transform(m_xmOOBB, temp);
+		m_xmOOBB.Center = { m_xmf4x4World._41,m_xmf4x4World._42,m_xmf4x4World._43 + 20 };
 		//m_pChild->m_xmOOBB.Transform(m_xmOOBB, XMLoadFloat4x4(&m_xmf4x4World));
 		XMStoreFloat4(&m_xmOOBB.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
-		cout << m_pChild->m_pstrFrameName <<" OOBB(" << m_xmOOBB.Center.x << ", " << m_xmOOBB.Center.z << ")" << endl;
+		//cout << m_pChild->m_pstrFrameName <<" OOBB(" << m_xmOOBB.Center.x << ", " << m_xmOOBB.Center.z << ")" << endl;
 	}
+}
+
+void CGameObject::SetTransformMatrixToDefualtMatrix()
+{
+	m_xmf4x4DefaultTransform = m_xmf4x4Transform;
+}
+
+void CGameObject::ResetTransformMatrix()
+{
+	m_xmf4x4Transform = m_xmf4x4DefaultTransform;
 }
 
 void CGameObject::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
@@ -308,6 +319,21 @@ void CGameObject::MoveForward(float fDistance)
 	XMFLOAT3 xmf3Look = GetLook();
 	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, fDistance);
 	CGameObject::SetPosition(xmf3Position);
+}
+
+void CGameObject::GoAway(XMFLOAT3& PlayerPosition, float fTimeElapsed) {
+	XMFLOAT3 xmf3Position = GetPosition();
+	xmf3Position = Vector3::Add(xmf3Position, m_xmf3ModelPosition);		// 월드 좌표
+	XMFLOAT3 direction = Vector3::Normalize(Vector3::Subtract(xmf3Position, PlayerPosition));		// 플레이어 -> 오브젝트(월드) 단위벡터
+
+	xmf3Position = Vector3::Add(xmf3Position, direction, 300 * fTimeElapsed);
+	XMFLOAT3 xmf3Up = { 0,1,0 };
+	xmf3Position = Vector3::Add(xmf3Position, xmf3Up, 50 * fTimeElapsed);
+	XMFLOAT3 xmf3Look = { 0,0,1 };
+	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, -100 * fTimeElapsed);
+	Rotate(0, 3, 0);
+	CGameObject::SetPosition(xmf3Position);
+	++m_iGoAwayFrame;
 }
 
 void CGameObject::Rotate(float fPitch, float fYaw, float fRoll)
@@ -801,9 +827,34 @@ void CCarObject::Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent)
 		m_pBackRightFrame->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_pBackRightFrame->m_xmf4x4Transform);
 	}
 
-	if (m_xmf4x4World._43 > -300) MoveForward(-10 *fTimeElapsed);
+	if (m_xmf4x4World._43 > -150 && m_iGoAwayFrame <1000) MoveForward(-m_fSpeed * fTimeElapsed);
+	else Reposition();
 
 	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
+}
+
+void CCarObject::Reposition()
+{
+	random_device rd;
+	default_random_engine dre(rd());
+	uniform_int_distribution<> line(0, 2);
+	uniform_int_distribution<> speed(50, 100);
+	ResetTransformMatrix();
+	switch (line(dre)) {
+	case 0:
+		SetPosition(-m_xmf3ModelPosition.x - 60, -m_xmf3ModelPosition.y, -m_xmf3ModelPosition.z + 650);
+		break;
+	case 1:
+		SetPosition(-m_xmf3ModelPosition.x, -m_xmf3ModelPosition.y, -m_xmf3ModelPosition.z + 650);
+		break;
+	case 2:
+		SetPosition(-m_xmf3ModelPosition.x + 60, -m_xmf3ModelPosition.y, -m_xmf3ModelPosition.z + 650);
+		break;
+	}
+	m_fSpeed = speed(dre);
+	m_bCrash = false;
+	m_iGoAwayFrame = 0;
+	UpdateBoundingBox();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

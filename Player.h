@@ -83,7 +83,6 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
 public:
 	int m_iMovetoLine = 1;
-	int m_iBeforeLine = 1;
 	bool m_bMoving = false;
 };
 

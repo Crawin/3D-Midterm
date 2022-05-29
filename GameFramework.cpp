@@ -467,7 +467,6 @@ void CGameFramework::ProcessInput()
 
 void CGameFramework::MovingLine()
 {
-	//if (m_pPlayer->m_iBeforeLine != m_pPlayer->m_iMovetoLine) {
 	if (m_pPlayer->m_bMoving) {
 		XMFLOAT3 goal;
 		XMFLOAT3 direction;
@@ -478,24 +477,21 @@ void CGameFramework::MovingLine()
 			direction = Vector3::Subtract(goal, m_pPlayer->GetPosition());
 			goal = Vector3::ScalarProduct(direction, speed, false);
 			m_pPlayer->Move(goal, false);
-			if (abs(direction.x) < 0.1)m_pPlayer->m_bMoving = false;
-			//if (m_pPlayer->GetPosition().x < -49.3)	m_pPlayer->m_iBeforeLine = 0;
+			if (abs(direction.x) < 0.3)m_pPlayer->m_bMoving = false;
 			break;
 		case 1:
 			goal = { 0,0,0 };
 			direction = Vector3::Subtract(goal, m_pPlayer->GetPosition());
 			goal = Vector3::ScalarProduct(direction, speed, false);
 			m_pPlayer->Move(goal, false);
-			if (abs(direction.x) < 0.1)m_pPlayer->m_bMoving = false;
-			//if (abs(m_pPlayer->GetPosition().x) < 0.3)	m_pPlayer->m_iBeforeLine = 1;
+			if (abs(direction.x) < 0.3)m_pPlayer->m_bMoving = false;
 			break;
 		case 2:
 			goal = { 60,0,0 };
 			direction = Vector3::Subtract(goal, m_pPlayer->GetPosition());
 			goal = Vector3::ScalarProduct(direction, speed, false);
 			m_pPlayer->Move(goal, false);
-			if (abs(direction.x) < 0.1)m_pPlayer->m_bMoving = false;
-			//if (m_pPlayer->GetPosition().x > 49.3)	m_pPlayer->m_iBeforeLine = 2;
+			if (abs(direction.x) < 0.3)m_pPlayer->m_bMoving = false;
 			break;
 		}
 	}
@@ -547,8 +543,6 @@ void CGameFramework::FrameAdvance()
 	MovingLine();
 
     AnimateObjects();
-
-	// 여기에 충돌체크 
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -616,4 +610,3 @@ void CGameFramework::FrameAdvance()
 	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
-
