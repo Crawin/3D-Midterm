@@ -196,6 +196,7 @@ void CGameObject::UpdateBoundingBox()
 	if (m_pChild)
 	{
 		XMMATRIX temp = XMLoadFloat4x4(&m_xmf4x4World);
+		cout <<m_pChild->m_pstrFrameName<<": " << m_xmf4x4World._41 << "," << m_xmf4x4World._42 << "," << m_xmf4x4World._43 << endl;
 		temp = temp + DirectX::XMMatrixTranslation(m_xmf3ModelPosition.x, m_xmf3ModelPosition.y, m_xmf3ModelPosition.z);
 
 		//m_xmOOBB.Transform(m_xmOOBB, temp);
