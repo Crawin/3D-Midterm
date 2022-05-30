@@ -196,7 +196,7 @@ void CGameObject::UpdateBoundingBox()
 	if (m_pChild)
 	{
 		XMMATRIX temp = XMLoadFloat4x4(&m_xmf4x4World);
-		cout <<m_pChild->m_pstrFrameName<<": " << m_xmf4x4World._41 << "," << m_xmf4x4World._42 << "," << m_xmf4x4World._43 << endl;
+		//cout <<m_pChild->m_pstrFrameName<<": " << m_xmf4x4World._41 << "," << m_xmf4x4World._42 << "," << m_xmf4x4World._43 << endl;
 		temp = temp + DirectX::XMMatrixTranslation(m_xmf3ModelPosition.x, m_xmf3ModelPosition.y, m_xmf3ModelPosition.z);
 
 		//m_xmOOBB.Transform(m_xmOOBB, temp);
@@ -332,7 +332,7 @@ void CGameObject::GoAway(XMFLOAT3& PlayerPosition, float fTimeElapsed) {
 	xmf3Position = Vector3::Add(xmf3Position, xmf3Up, 50 * fTimeElapsed);
 	XMFLOAT3 xmf3Look = { 0,0,1 };
 	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, -100 * fTimeElapsed);
-	Rotate(0, 3, 0);
+	Rotate(0, 8, 0);
 	CGameObject::SetPosition(xmf3Position);
 	++m_iGoAwayFrame;
 }
@@ -947,7 +947,7 @@ void CRallyCarObject::OnInitialize()
 
 void CBackObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 {
-	if (m_xmf4x4World._43 > -300)MoveForward(-200 * fTimeElapsed);
+	if (m_xmf4x4World._43 > -300)MoveForward(-m_fSpeed * fTimeElapsed);
 	else 
 		switch (type) {
 		case 0:m_xmf4x4Transform._43 = -4.797254 * 40 + 3 * 200; break;

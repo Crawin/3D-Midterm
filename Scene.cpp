@@ -119,6 +119,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			pBackObject->SetScale(10.f, 10.f, 10.f);
 			break;
 		}
+		pBackObject->m_fSpeed = 200;
 		pBackObject->Rotate(0.0f, 0.0f, 0.0f);
 		pBackObject->SetTransformMatrixToDefualtMatrix();
 		m_ppBackObjects[i] = pBackObject;
@@ -299,6 +300,26 @@ bool CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 			m_pPlayer->m_bMoving = true;
 			m_pPlayer->m_iMovetoLine++;
 			if (m_pPlayer->m_iMovetoLine > 2)	m_pPlayer->m_iMovetoLine = 2;
+			break;
+		case 189:
+			cout << "-" << endl;
+			for (int i = 0; i < m_nGameObjects - 1; ++i) {
+				m_ppGameObjects[i]->m_fSpeed -= 50;
+				if(m_ppGameObjects[i]->m_fSpeed < 20) 	m_ppGameObjects[i]->m_fSpeed += 50;
+			}
+			for (int i = 0; i < m_nBackObjects; ++i) {
+				m_ppBackObjects[i]->m_fSpeed -= 50;
+				if (m_ppBackObjects[i]->m_fSpeed < 100) 	m_ppBackObjects[i]->m_fSpeed += 50;
+			}
+			break;
+		case 187:
+			cout << "+" << endl;
+			for (int i = 0; i < m_nGameObjects - 1; ++i) {
+				m_ppGameObjects[i]->m_fSpeed+=50;
+			}
+			for (int i = 0; i < m_nBackObjects; ++i) {
+				m_ppBackObjects[i]->m_fSpeed += 50;
+			}
 			break;
 		default:
 			break;
