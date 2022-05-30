@@ -469,7 +469,7 @@ void CGameFramework::MovingLine()
 	if (m_pPlayer->m_bMoving) {
 		XMFLOAT3 goal;
 		XMFLOAT3 direction;
-		float speed = 0.04f;
+		float speed = 0.01f;
 		switch (m_pPlayer->m_iMovetoLine) {
 		case 0:
 			goal = { -60,0,0 };

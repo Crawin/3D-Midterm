@@ -143,6 +143,7 @@ public:
 	bool							m_bCrash = false;
 	int								m_iGoAwayFrame = 0;
 	int						m_fSpeed = 0;
+	int						m_iAddSpeed = 0;
 	void SetMesh(CMesh *pMesh);
 	void SetShader(CShader *pShader);
 	void SetShader(int nMaterial, CShader *pShader);

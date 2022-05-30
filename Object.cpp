@@ -852,7 +852,7 @@ void CCarObject::Reposition()
 		SetPosition(-m_xmf3ModelPosition.x + 60, -m_xmf3ModelPosition.y, -m_xmf3ModelPosition.z + 650);
 		break;
 	}
-	m_fSpeed = speed(dre);
+	m_fSpeed = speed(dre) + m_iAddSpeed;
 	m_bCrash = false;
 	m_iGoAwayFrame = 0;
 	UpdateBoundingBox();

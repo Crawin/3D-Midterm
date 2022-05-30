@@ -305,17 +305,22 @@ bool CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 			cout << "-" << endl;
 			for (int i = 0; i < m_nGameObjects - 1; ++i) {
 				m_ppGameObjects[i]->m_fSpeed -= 50;
-				if(m_ppGameObjects[i]->m_fSpeed < 20) 	m_ppGameObjects[i]->m_fSpeed += 50;
+				m_ppGameObjects[i]->m_iAddSpeed -= 50;
+				if (m_ppGameObjects[i]->m_fSpeed < 20) {
+					m_ppGameObjects[i]->m_fSpeed += 50;
+					m_ppGameObjects[i]->m_iAddSpeed += 50;
+				}
 			}
 			for (int i = 0; i < m_nBackObjects; ++i) {
 				m_ppBackObjects[i]->m_fSpeed -= 50;
-				if (m_ppBackObjects[i]->m_fSpeed < 100) 	m_ppBackObjects[i]->m_fSpeed += 50;
+				if (m_ppBackObjects[i]->m_fSpeed < 100) m_ppBackObjects[i]->m_fSpeed += 50;
 			}
 			break;
 		case 187:
 			cout << "+" << endl;
 			for (int i = 0; i < m_nGameObjects - 1; ++i) {
 				m_ppGameObjects[i]->m_fSpeed+=50;
+				m_ppGameObjects[i]->m_iAddSpeed += 50;
 			}
 			for (int i = 0; i < m_nBackObjects; ++i) {
 				m_ppBackObjects[i]->m_fSpeed += 50;
